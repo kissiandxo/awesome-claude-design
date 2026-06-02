@@ -19,7 +19,7 @@ BG = "#0A0A0A"        # near-black tile
 FG = "#F5F5F2"        # near-white symbol
 SHOW_SPARKLES = False  # Teletech style has none; flip to re-add subtle ones
 
-W = 74                # stroke half-width (148px bold strokes)
+W = 42                # stroke half-width (84px slim strokes; flare is at the tips)
 OVER = 8              # shaft overlap into each cap (seamless join)
 
 # ---- Teletech-style forked terminal cap (local coords, points "up" = -y) ----
