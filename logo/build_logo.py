@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Generate the redesigned cross logo (SVG) and render the PNG icon set.
+"""Generate the LT monogram logo (SVG) and render the PNG icon set.
 
-The mark is a four-way symmetric cross with bold arms whose ends flare into a
-wide head that is split by a short central notch (forked/heraldic tips, styled
-after the reference), plus two subtle 4-pointed sparkles. White-on-black,
-rounded app-icon corners. One arm is authored and mirrored/rotated so the
-result is perfectly symmetric.
+The mark is an "L and T merged" letterform — a shared vertical stem with the
+T's crossbar near the top and the L's foot at the bottom-right — drawn in the
+Teletech / "TT" style: every free stroke ends in a flared, forked (split)
+terminal with a small dot in the crook. White-on-black, rounded app-icon
+corners. Each terminal is one authored cap, reused/rotated to every stroke end
+so the style is identical across the mark.
 
 Run:  python3 logo/build_logo.py
 """
@@ -13,74 +14,81 @@ import cairosvg
 
 # ---- canvas / palette -------------------------------------------------------
 SIZE = 1024
-CX = CY = SIZE / 2
 CORNER = 224          # rounded-corner radius (~22%, matches the app icon)
 BG = "#0A0A0A"        # near-black tile
 FG = "#F5F5F2"        # near-white symbol
+SHOW_SPARKLES = False  # Teletech style has none; flip to re-add subtle ones
 
-m = lambda x: 2 * CX - x   # mirror across the vertical center
+W = 74                # stroke half-width (148px bold strokes)
+OVER = 8              # shaft overlap into each cap (seamless join)
 
-# ---- cross arm geometry (up arm; mirrored L/R, rotated 4x) ------------------
-sh  = 86             # shaft half-width  -> 172px arms (clear negative space)
-iy  = CY + 96        # inner end (past center, for the 4-arm overlap)
-fy  = CY - 178       # flare begins near the end (long straight shaft)
-hh  = 112            # head half-width (modest flare)
-hy  = CY - 236       # outer corner y of the flared head
-ty  = CY - 264       # prong-tip y (short, contained tips)
-pin = 8              # how far the rounded tip leans in from the outer corner
-iw  = 24             # inner notch half-width (top opening of the split)
-ny  = CY - 236       # inner notch y
-nby = CY - 228       # notch bottom (shallow center dip)
+# ---- Teletech-style forked terminal cap (local coords, points "up" = -y) ----
+def cap(w):
+    """Flared, forked split terminal. Base-centered at (0,0); extends up (-y).
 
-
-def arm_path():
-    """Path 'd' for one upward arm: long shaft, modest flare, short forked tip."""
+    Short, contained prongs with a shallow central notch — the clean heraldic
+    terminal, not long spikes. Pair with a dot at (0, -68) for the crook detail.
+    """
+    hh = w + 26          # flared half-width (outer corner)
+    tip = w + 18         # prong-tip half-width
     return (
-        f"M {CX-sh} {iy} "
-        f"L {CX-sh} {fy} "
-        # flare: shaft -> outer corner of head
-        f"C {CX-sh} {fy-20} {CX-hh} {hy+26} {CX-hh} {hy} "
-        # outer edge -> rounded left prong tip (leans slightly in)
-        f"C {CX-hh} {hy-16} {CX-hh+pin-2} {ty+10} {CX-hh+pin} {ty} "
-        # inner edge -> down to notch
-        f"C {CX-hh+26} {ty+18} {CX-iw-26} {ny-12} {CX-iw} {ny} "
-        # notch dip across center
-        f"Q {CX-iw+8} {nby-4} {CX} {nby} "
-        # ---- mirror to the right half ----
-        f"Q {m(CX-iw+8)} {nby-4} {m(CX-iw)} {ny} "
-        f"C {m(CX-iw-26)} {ny-12} {m(CX-hh+26)} {ty+18} {m(CX-hh+pin)} {ty} "
-        f"C {m(CX-hh+pin-2)} {ty+10} {m(CX-hh)} {hy-16} {m(CX-hh)} {hy} "
-        f"C {m(CX-hh)} {hy+26} {m(CX-sh)} {fy-20} {m(CX-sh)} {fy} "
-        f"L {m(CX-sh)} {iy} Z"
+        f"M {-w} 0 "
+        f"C {-w} -20 {-hh} -32 {-hh} -58 "                 # flare -> outer corner
+        f"C {-hh} -74 {-(tip+2)} -76 {-tip} -86 "          # -> left prong tip
+        f"C {-(hh-26)} -68 -50 -46 -24 -58 "               # inner edge -> notch top
+        f"Q -16 -46 0 -50 "                                # dip to center
+        f"Q 16 -46 24 -58 "                                # (mirror) ->
+        f"C 50 -46 {hh-26} -68 {tip} -86 "
+        f"C {tip+2} -76 {hh} -74 {hh} -58 "
+        f"C {hh} -32 {w} -20 {w} 0 Z"
     )
 
 
-def sparkle(px, py_, r, k=0.16):
-    """4-pointed concave 'twinkle' star centered at (px, py_)."""
+def sparkle(px, py, r, k=0.16):
     c = r * k
     return (
-        f"M {px} {py_-r} "
-        f"Q {px+c} {py_-c} {px+r} {py_} "
-        f"Q {px+c} {py_+c} {px} {py_+r} "
-        f"Q {px-c} {py_+c} {px-r} {py_} "
-        f"Q {px-c} {py_-c} {px} {py_-r} Z"
+        f"M {px} {py-r} Q {px+c} {py-c} {px+r} {py} Q {px+c} {py+c} {px} {py+r} "
+        f"Q {px-c} {py+c} {px-r} {py} Q {px-c} {py-c} {px} {py-r} Z"
+    )
+
+
+# ---- LT layout (stem / crossbar / foot) -------------------------------------
+SX = 512              # stem center x (symbol is centered on canvas)
+TOP = 346             # up-cap base y (stem top); tip reaches ~242
+BOT = 770             # bottom edge (L corner)
+CY = 452              # crossbar center y
+FY = 696              # foot center y
+CAP_L = SX - 114      # crossbar left cap base x  (398)
+CAP_R = SX + 114      # crossbar right cap base x (626)
+FOOT_R = SX + 114     # foot right cap base x     (626)
+
+
+def term(cx, cy, angle):
+    """One terminal: a rotated cap plus its dot, placed at (cx, cy)."""
+    return (
+        f'<g transform="translate({cx} {cy}) rotate({angle})">'
+        f'<path d="{cap(W)}"/><circle cx="0" cy="-68" r="11"/></g>'
     )
 
 
 def build_svg():
-    arm = arm_path()
-    pellet = f'<circle cx="{CX}" cy="{nby-18}" r="11"/>'   # dot in the fork crook
-    # one arm + its pellet, rotated to the four directions
-    arms = "".join(
-        f'<g transform="rotate({a} {CX} {CY})"><path d="{arm}"/>{pellet}</g>'
-        for a in (0, 90, 180, 270)
+    shafts = (
+        f'<rect x="{SX-W}" y="{TOP-OVER}" width="{2*W}" height="{BOT-(TOP-OVER)}"/>'  # stem
+        f'<rect x="{CAP_L-OVER}" y="{CY-W}" width="{(CAP_R+OVER)-(CAP_L-OVER)}" height="{2*W}"/>'  # crossbar
+        f'<rect x="{SX-W}" y="{FY-W}" width="{(FOOT_R+OVER)-(SX-W)}" height="{2*W}"/>'  # foot
     )
-    sparkles = sparkle(320, 322, 30) + " " + sparkle(704, 700, 20)
+    terminals = (
+        term(SX, TOP, 0)        # stem top  (up)
+        + term(CAP_L, CY, -90)  # crossbar left
+        + term(CAP_R, CY, 90)   # crossbar right
+        + term(FOOT_R, FY, 90)  # foot right
+    )
+    extra = (sparkle(322, 318, 28) + sparkle(706, 320, 18)) if SHOW_SPARKLES else ""
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{SIZE}" height="{SIZE}" '
         f'viewBox="0 0 {SIZE} {SIZE}">'
-        f'<rect x="0" y="0" width="{SIZE}" height="{SIZE}" rx="{CORNER}" ry="{CORNER}" fill="{BG}"/>'
-        f'<g fill="{FG}">{arms}<path d="{sparkles}"/></g>'
+        f'<rect width="{SIZE}" height="{SIZE}" rx="{CORNER}" ry="{CORNER}" fill="{BG}"/>'
+        f'<g fill="{FG}">{shafts}{terminals}<path d="{extra}"/></g>'
         f"</svg>"
     )
 

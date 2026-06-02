@@ -1,10 +1,11 @@
 # Logo
 
-Redesigned cross logo — a four-way **symmetric heraldic cross** with bold arms
-that flare into short **forked (split) tips**, each with a small dot in the
-crook, plus two **subtle 4-pointed sparkles**. Restyled after the reference
-("TT") while keeping the original mark's identity, rounded app-icon corners, and
-1024×1024 dimensions. Monochrome: near-white `#F5F5F2` on near-black `#0A0A0A`.
+An **L + T merged** monogram drawn in the **Teletech / "TT"** style: a shared
+vertical stem with the **T**'s crossbar near the top and the **L**'s foot at the
+bottom-right. Every free stroke ends in a flared, **forked (split) terminal**
+with a small dot in the crook — the same terminal authored once and reused at
+each stroke end so the style is identical across the mark. Monochrome: near-white
+`#F5F5F2` on near-black `#0A0A0A`, rounded app-icon corners, 1024×1024.
 
 ## Files
 
@@ -26,6 +27,9 @@ pip install cairosvg          # one-time
 python3 logo/build_logo.py    # run from the repo root
 ```
 
-Tune the look by editing the geometry constants near the top of
-`build_logo.py` (arm width `sh`, flare `hh`, tip length `ty`, notch, sparkle
-size/position), then re-run.
+Tune via the constants in `build_logo.py`:
+
+- **Terminal style** — `cap()` (flare width `hh`, prong length, notch depth).
+- **Letterform layout** — `SX`, `TOP`, `BOT`, `CY` (crossbar height), `FY` (foot
+  height), `CAP_L` / `CAP_R` / `FOOT_R` (arm + foot reach), stroke weight `W`.
+- **Sparkles** — set `SHOW_SPARKLES = True` to re-add subtle 4-pointed stars.
