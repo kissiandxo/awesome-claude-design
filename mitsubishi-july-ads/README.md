@@ -10,24 +10,30 @@ Higgsfield **Elements** so every ad shows *our* car and *our* store:
 
 ## July offers used in the creative
 
-Sourced from Mitsubishi Motors' national July 2026 programs — **verify against your
-current dealer bulletin before publishing**, and swap in regional offers if this store
-sells the Exceed trim outside the US market:
+Sourced from Mitsubishi Motors' national July 2026 program (July 1 – August 3 window) —
+**verify against your current dealer bulletin before publishing**, and swap in regional
+offers if this store sells the Exceed trim outside the US market:
 
-1. **0.0% APR for 72 months** on select new 2026 Outlander models — new retail delivery by **July 6, 2026**.
-2. **Up to $4,500 factory rebate** on select Outlander PHEV / 2026 Outlander Trail Edition — through **July 6, 2026** (not combinable with special APR/lease).
-3. **4.99% APR for 72 months** on any new 2026 Outlander PHEV — **July 1 – August 3, 2026**.
+1. **Up to $4,500 factory rebate** on select 2025 Outlander PHEV trims (SE / SEL / SEL Premium / SEL Black Edition / Platinum Edition) — not combinable with special APR/lease.
+2. **4.99% APR for 72 months** on any new 2026 Outlander PHEV — **July 1 – August 3, 2026**.
+3. **2.99% APR for 60 months** on a new 2026 Outlander (excl. Trail Edition & Ralliart) — **July 1 – August 3, 2026**.
+4. Lease example: 2026 Outlander ES 1.5T 2WD, **$389/mo × 39 months**, $4,388 due at signing.
+
+The earlier headline offers (0% APR/72 mo, rebate window ending July 6) expired
+on July 6, 2026 and were removed from the page.
 
 ## Files
 
-- `index.html` — drop-in, self-contained ad section for the dealer website
-  (hero banner + two offer tiles + compliance fine print). Images load from `assets/`.
-- `prompts.md` — the three optimized Higgsfield generation prompts (model,
-  aspect ratio, element placeholders). Re-run any prompt to refresh a creative.
-- `assets/` — destination for the generated ads:
-  - `hero-july-sales-event.jpg` (16:9 website hero)
-  - `tile-phev-rebate.jpg` (1:1 offer tile)
-  - `tile-finance-offer.jpg` (4:5 offer tile)
+- `index.html` — the full **July Sales Event landing page**: self-contained single file
+  (all imagery embedded as data URIs), cinematic dark theme, live countdown to the
+  August 3 offer deadline, offer cards, Outlander Exceed showcase, and compliance
+  fine print. Drop it onto the dealer site as-is.
+- `prompts.md` — three optimized Higgsfield generation prompts (model, aspect ratio,
+  element placeholders) for future AI ad composites. Note: offer copy inside the
+  prompts reflects the pre-July-6 program — refresh the text before re-running.
+- `assets/` — the campaign imagery, cut from the two Higgsfield Elements:
+  `gateway-hero.jpg` (dealership at dusk), `car-hero.jpg` (rear three-quarter),
+  `car-front.jpg`, `car-side.jpg`, and the `det-*.jpg` close-up tiles.
 
 ## Regenerating the ads
 
